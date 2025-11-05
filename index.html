@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>משחקי למידה - מבחן כימיה של מיכה 🧪</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .menu-btn {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            padding: 25px 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            touch-action: manipulation;
+        }
+
+        .menu-btn:active {
+            transform: scale(0.95);
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .game-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+
+        .score-board {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* Flashcards */
+        .flashcard {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            min-height: 300px;
+            border-radius: 15px;
+            padding: 30px;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 240px;
+            font-size: 1.3em;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .flashcard-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            transform: rotateY(180deg);
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .flashcard-front {
+            backface-visibility: hidden;
+        }
+
+        .card-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .card-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+            max-width: 200px;
+            transition: all 0.3s;
+        }
+
+        .card-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Quiz */
+        .question {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid #667eea;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            text-align: right;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #333;
+        }
+
+        .option-btn:active {
+            transform: scale(0.98);
+        }
+
+        .option-btn.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+            animation: pulse 0.5s;
+        }
+
+        .option-btn.wrong {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Fill in the blanks */
+        .fill-blank-question {
+            font-size: 1.2em;
+            line-height: 2;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .blank-input {
+            background: #fff;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 1em;
+            margin: 0 5px;
+            min-width: 150px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .blank-input.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .blank-input.wrong {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .check-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .check-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Matching game */
+        .matching-container {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .matching-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .match-item {
+            background: white;
+            border: 3px solid #667eea;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .match-item.selected {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .match-item.matched {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+            cursor: default;
+            animation: pulse 0.5s;
+        }
+
+        /* True/False */
+        .true-false-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tf-btn {
+            padding: 30px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .tf-btn.true {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        }
+
+        .tf-btn.false {
+            background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+        }
+
+        .tf-btn:active {
+            transform: scale(0.95);
+        }
+
+        .progress {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.5s;
+            border-radius: 5px;
+        }
+
+        .result-message {
+            text-align: center;
+            font-size: 1.5em;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 15px;
+            font-weight: bold;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-message.success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .result-message.info {
+            background: #2196F3;
+            color: white;
+        }
+
+        .next-btn {
+            background: #764ba2;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .next-btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .menu {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-container {
+                padding: 20px;
+            }
+            
+            .question, .fill-blank-question {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 משחקי למידה - כימיה</h1>
+            <p>בהצלחה במבחן מחר, מיקה! 💪</p>
+        </div>
+
+        <div id="menu" class="menu">
+            <button class="menu-btn" onclick="startGame('flashcards')">
+                🎴<br>כרטיסיות<br>למידה
+            </button>
+            <button class="menu-btn" onclick="startGame('quiz')">
+                🎯<br>חידון<br>רב-ברירה
+            </button>
+            <button class="menu-btn" onclick="startGame('fillblanks')">
+                ✍️<br>השלמת<br>משפטים
+            </button>
+            <button class="menu-btn" onclick="startGame('matching')">
+                🔗<br>משחק<br>התאמות
+            </button>
+            <button class="menu-btn" onclick="startGame('truefalse')">
+                ✅<br>נכון או<br>לא נכון
+            </button>
+        </div>
+
+        <!-- Flashcards Game -->
+        <div id="flashcards" class="game-container">
+            <button class="back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score-board">
+                כרטיסייה <span id="fc-current">1</span> מתוך <span id="fc-total">0</span>
+            </div>
+            <div id="flashcard-area"></div>
+            <div class="card-controls">
+                <button class="card-btn" onclick="previousCard()">⏮ הקודם</button>
+                <button class="card-btn" onclick="nextCard()">הבא ⏭</button>
+            </div>
+        </div>
+
+        <!-- Quiz Game -->
+        <div id="quiz" class="game-container">
+            <button class="back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score-board">
+                ניקוד: <span id="quiz-score">0</span> | שאלה <span id="quiz-current">1</span>/<span id="quiz-total">0</span>
+            </div>
+            <div class="progress">
+                <div id="quiz-progress" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <div id="quiz-area"></div>
+        </div>
+
+        <!-- Fill in the Blanks Game -->
+        <div id="fillblanks" class="game-container">
+            <button class="back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score-board">
+                ניקוד: <span id="fb-score">0</span> | שאלה <span id="fb-current">1</span>/<span id="fb-total">0</span>
+            </div>
+            <div class="progress">
+                <div id="fb-progress" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <div id="fillblank-area"></div>
+        </div>
+
+        <!-- Matching Game -->
+        <div id="matching" class="game-container">
+            <button class="back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score-board">
+                ניקוד: <span id="match-score">0</span> | התאמות נכונות: <span id="match-correct">0</span>/<span id="match-total">0</span>
+            </div>
+            <div class="progress">
+                <div id="match-progress" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <div id="matching-area"></div>
+        </div>
+
+        <!-- True/False Game -->
+        <div id="truefalse" class="game-container">
+            <button class="back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score-board">
+                ניקוד: <span id="tf-score">0</span> | שאלה <span id="tf-current">1</span>/<span id="tf-total">0</span>
+            </div>
+            <div class="progress">
+                <div id="tf-progress" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <div id="truefalse-area"></div>
+        </div>
+    </div>
+
+    <script>
+        // Study Material Data
+        const flashcardsData = [
+            {
+                question: "מהו תהליך ההזנה?",
+                answer: "תהליך ההזנה הוא אחד ממאפייני החיים המשותפים לכל היצורים. תהליך זה מתייחס לצורך של יצורים חיים במזון לקיומם, שכן כל היצורים החיים צורכים אנרגיה וחומרים מהסביבה."
+            },
+            {
+                question: "מהם תפקידי המזון?",
+                answer: "1) בניית הגוף - המזון מספק את החומרים הנחוצים לבניית התאים, הרקמות והאיברים. 2) אספקת אנרגיה - כל היצורים החיים צורכים אנרגיה וחומרים מהסביבה לצורך קיומם."
+            },
+            {
+                question: "מהו חומר אורגני?",
+                answer: "חומר אורגני הוא חומר המכיל פחמן (C) וקשור בדרך כלל ליצורים חיים. רוב החומרים האורגניים מכילים מימן (H) ולעיתים גם חמצן (O), חנקן (N) וגופרית (S)."
+            },
+            {
+                question: "מהם שלושת החומרים האורגניים העיקריים?",
+                answer: "שלושת החומרים האורגניים העיקריים הם: 1) פחמימות 2) שומנים 3) חלבונים"
+            },
+            {
+                question: "מהן דוגמאות לחומרים אנאורגניים?",
+                answer: "דוגמאות לחומרים אנאורגניים: מים (H₂O), פחמן דו-חמצני (CO₂), חמצן (O₂), מלחים מינרליים כמו נתרן כלורי (NaCl - מלח בישול)"
+            },
+            {
+                question: "מהם תפקידי הפחמימות?",
+                answer: "תפקידי הפחמימות: 1) מקור אנרגיה זמינה לתאים 2) חומרי תשמורת (עמילן בצמחים, גליקוגן בבעלי חיים) 3) חומר בניין (תאית בדפנות תאי הצמח)"
+            },
+            {
+                question: "מהן שלוש הקבוצות של פחמימות?",
+                answer: "שלוש קבוצות הפחמימות: 1) חד-סוכרים (מונו-סכרידים) - כמו גלוקוז 2) דו-סוכרים (די-סכרידים) - כמו סוכרוז ולקטוז 3) רב-סוכרים (פולי-סכרידים) - כמו עמילן, גליקוגן ותאית"
+            },
+            {
+                question: "מהו אינדיקטור?",
+                answer: "אינדיקטור (Indicator) הוא חומר בוחן. תפקידו לסייע בזיהוי חומרים מסוימים או להבחין בין חומרים שונים. הוא עושה זאת על ידי שינוי צבע או שינוי מצב בעקבות המגע עם החומר הנבדק."
+            },
+            {
+                question: "מהם חומרי התשמורת?",
+                answer: "חומרי התשמורת הם חומרים אורגניים הנבנים ונאגרים בצמחים ובבעלי חיים ומשמשים כ'מחסני אנרגיה' לשימוש עתידי. העיקריים: עמילן (בצמחים), גליקוגן (בבעלי חיים), ושומנים."
+            },
+            {
+                question: "מהו חומר תשמורת בצמחים?",
+                answer: "חומר התשמורת העיקרי בצמחים הוא עמילן."
+            },
+            {
+                question: "מהו חומר תשמורת בבעלי חיים?",
+                answer: "חומר התשמורת העיקרי בבעלי חיים הוא גליקוגן."
+            },
+            {
+                question: "מה תפקיד התאית?",
+                answer: "התאית מספקת לתא הצמחי קשיחות ותמיכה מבנית. בגוף האדם, אף שאינה מתעכלת, היא מהווה סיב תזונתי, מוסיפה נפח למזון ומסייעת לפעילות תקינה של מערכת העיכול."
+            },
+            {
+                question: "מה משותף לכל הרב-סוכרים?",
+                answer: "כולם בנויים ממולקולות רבות של חד-סוכרים (בדרך כלל גלוקוז) המחוברות ביניהן בקשרים כימיים. הם תרכובות פחמימות גדולות, רובם אינם מתוקים ואינם מסיסים במים."
+            },
+            {
+                question: "איזה סוכרים מתוקים?",
+                answer: "חד-סוכרים (כגון גלוקוז) ודו-סוכרים (כגון סוכרוז ולקטוז) הם מתוקים. רב-סוכרים (כגון עמילן, גליקוגן ותאית) אינם מתוקים."
+            },
+            {
+                question: "איזה סוכרים עוברים דרך תאים?",
+                answer: "רק חד-סוכרים (כגון גלוקוז) יכולים לעבור דרך קרום התא. הפחמימות הגדולות יותר חייבות להתפרק ליחידות הבניין הקטנות שלהן בתהליך העיכול."
+            }
+        ];
+
+        const quizData = [
+            {
+                question: "מהו תהליך ההזנה?",
+                options: [
+                    "אחד ממאפייני החיים - צריכת אנרגיה וחומרים מהסביבה",
+                    "רק צריכת מים",
+                    "רק תהליך העיכול",
+                    "רק בניית הגוף"
+                ],
+                correct: 0
+            },
+            {
+                question: "מהם תפקידי המזון העיקריים?",
+                options: [
+                    "רק אספקת אנרגיה",
+                    "רק בניית הגוף",
+                    "בניית הגוף ואספקת אנרגיה",
+                    "רק שמירה על חום גוף"
+                ],
+                correct: 2
+            },
+            {
+                question: "מהו חומר אורגני?",
+                options: [
+                    "חומר שאינו מכיל פחמן",
+                    "חומר המכיל פחמן וקשור ליצורים חיים",
+                    "רק מים",
+                    "רק חמצן"
+                ],
+                correct: 1
+            },
+            {
+                question: "מהם שלושת החומרים האורגניים העיקריים?",
+                options: [
+                    "מים, חמצן ומלחים",
+                    "פחמימות, שומנים וחלבונים",
+                    "רק פחמימות",
+                    "רק חלבונים"
+                ],
+                correct: 1
+            },
+            {
+                question: "איזה מהבאים הוא חומר אנאורגני?",
+                options: [
+                    "גלוקוז",
+                    "עמילן",
+                    "מים (H₂O)",
+                    "חלבון"
+                ],
+                correct: 2
+            },
+            {
+                question: "מהן שלוש הקבוצות של פחמימות?",
+                options: [
+                    "חד-סוכר, דו-סוכר, רב-סוכר",
+                    "רק חד-סוכר",
+                    "רק רב-סוכר",
+                    "חלבון, שומן, פחמימה"
+                ],
+                correct: 0
+            },
+            {
+                question: "מהו חומר התשמורת העיקרי בצמחים?",
+                options: [
+                    "גליקוגן",
+                    "עמילן",
+                    "תאית",
+                    "גלוקוז"
+                ],
+                correct: 1
+            },
+            {
+                question: "מהו חומר התשמורת העיקרי בבעלי חיים?",
+                options: [
+                    "עמילן",
+                    "תאית",
+                    "גליקוגן",
+                    "סוכרוז"
+                ],
+                correct: 2
+            },
+            {
+                question: "איזה סוכרים מתוקים?",
+                options: [
+                    "רק רב-סוכרים",
+                    "חד-סוכרים ודו-סוכרים",
+                    "רק תאית",
+                    "רק עמילן"
+                ],
+                correct: 1
+            },
+            {
+                question: "איזה סוכרים יכולים לעבור דרך קרום התא?",
+                options: [
+                    "רק חד-סוכרים",
+                    "רק דו-סוכרים",
+                    "רק רב-סוכרים",
+                    "כל הסוכרים"
+                ],
+                correct: 0
+            },
+            {
+                question: "מהו תפקיד התאית בצמחים?",
+                options: [
+                    "אגירת אנרגיה",
+                    "קשיחות ותמיכה מבנית לדופן התא",
+                    "רק ייצור סוכר",
+                    "רק העיכול"
+                ],
+                correct: 1
+            },
+            {
+                question: "מהו אינדיקטור?",
+                options: [
+                    "חומר מזין",
+                    "חומר בוחן שמשנה צבע לזיהוי חומרים",
+                    "רק מים",
+                    "חומר תשמורת"
+                ],
+                correct: 1
+            }
+        ];
+
+        const fillBlanksData = [
+            {
+                text: "תהליך ההזנה הוא אחד ממאפייני _____ המשותפים לכל היצורים.",
+                blanks: ["החיים"],
+                explanation: "תהליך ההזנה הוא מאפיין החיים המשותף לכל היצורים החיים."
+            },
+            {
+                text: "תפקידי המזון העיקריים הם _____ הגוף ואספקת _____.",
+                blanks: ["בניית", "אנרגיה"],
+                explanation: "המזון משמש לבניית הגוף ולאספקת אנרגיה."
+            },
+            {
+                text: "חומר אורגני הוא חומר המכיל _____ וקשור ליצורים חיים.",
+                blanks: ["פחמן"],
+                explanation: "חומרים אורגניים מכילים פחמן (C) והם קשורים ליצורים חיים."
+            },
+            {
+                text: "שלושת החומרים האורגניים העיקריים הם: פחמימות, _____ וחלבונים.",
+                blanks: ["שומנים"],
+                explanation: "שלושת החומרים האורגניים העיקריים: פחמימות, שומנים וחלבונים."
+            },
+            {
+                text: "הפחמימות מתחלקות לשלוש קבוצות: חד-סוכר, _____ ורב-סוכר.",
+                blanks: ["דו-סוכר"],
+                explanation: "שלוש קבוצות הפחמימות: חד-סוכר, דו-סוכר ורב-סוכר."
+            },
+            {
+                text: "חומר התשמורת העיקרי בצמחים הוא _____.",
+                blanks: ["עמילן"],
+                explanation: "עמילן הוא חומר התשמורת העיקרי בצמחים."
+            },
+            {
+                text: "חומר התשמורת העיקרי בבעלי חיים הוא _____.",
+                blanks: ["גליקוגן"],
+                explanation: "גליקוגן הוא חומר התשמורת העיקרי בבעלי חיים."
+            },
+            {
+                text: "התאית מספקת לתא הצמחי _____ ותמיכה מבנית.",
+                blanks: ["קשיחות"],
+                explanation: "התאית מספקת קשיחות ותמיכה מבנית לדופן התא בצמחים."
+            },
+            {
+                text: "רק _____ יכולים לעבור דרך קרום התא.",
+                blanks: ["חד-סוכרים"],
+                explanation: "רק חד-סוכרים קטנים מספיק כדי לעבור דרך קרום התא."
+            },
+            {
+                text: "אינדיקטור הוא חומר _____ שמשנה צבע לזיהוי חומרים.",
+                blanks: ["בוחן"],
+                explanation: "אינדיקטור הוא חומר בוחן המשמש לזיהוי חומרים."
+            }
+        ];
+
+        const matchingData = [
+            {
+                pairs: [
+                    { term: "עמילן", definition: "חומר תשמורת בצמחים" },
+                    { term: "גליקוגן", definition: "חומר תשמורת בבעלי חיים" },
+                    { term: "תאית", definition: "חומר בניין בדופן תא צמחי" },
+                    { term: "גלוקוז", definition: "חד-סוכר שעובר דרך קרום התא" }
+                ]
+            },
+            {
+                pairs: [
+                    { term: "חומר אורגני", definition: "חומר המכיל פחמן" },
+                    { term: "חומר אנאורגני", definition: "חומר שאינו מכיל פחמן" },
+                    { term: "אינדיקטור", definition: "חומר בוחן" },
+                    { term: "מזון", definition: "נחוץ לבניית הגוף ואספקת אנרגיה" }
+                ]
+            },
+            {
+                pairs: [
+                    { term: "חד-סוכר", definition: "סוכר פשוט כמו גלוקוז" },
+                    { term: "דו-סוכר", definition: "סוכר כפול כמו סוכרוז" },
+                    { term: "רב-סוכר", definition: "שרשרת ארוכה של סוכרים" },
+                    { term: "פחמימות", definition: "מקור אנרגיה זמינה" }
+                ]
+            }
+        ];
+
+        const trueFalseData = [
+            {
+                statement: "כל חומר שנכנס לפה הוא מזון",
+                answer: false,
+                explanation: "לא נכון! לא כל חומר שנכנס לפה הוא מזון."
+            },
+            {
+                statement: "חומר אורגני מכיל פחמן",
+                answer: true,
+                explanation: "נכון! חומר אורגני הוא חומר המכיל פחמן."
+            },
+            {
+                statement: "מים הם חומר אורגני",
+                answer: false,
+                explanation: "לא נכון! מים (H₂O) הם חומר אנאורגני כי אינם מכילים פחמן."
+            },
+            {
+                statement: "תפקידי המזון הם בניית הגוף ואספקת אנרגיה",
+                answer: true,
+                explanation: "נכון! שני תפקידי המזון העיקריים הם בניית הגוף ואספקת אנרגיה."
+            },
+            {
+                statement: "עמילן הוא חומר תשמורת בבעלי חיים",
+                answer: false,
+                explanation: "לא נכון! עמילן הוא חומר תשמורת בצמחים. גליקוגן הוא חומר התשמורת בבעלי חיים."
+            },
+            {
+                statement: "רב-סוכרים הם מתוקים",
+                answer: false,
+                explanation: "לא נכון! רב-סוכרים (כמו עמילן) אינם מתוקים. חד-סוכרים ודו-סוכרים הם המתוקים."
+            },
+            {
+                statement: "רק חד-סוכרים יכולים לעבור דרך קרום התא",
+                answer: true,
+                explanation: "נכון! רק חד-סוכרים קטנים מספיק כדי לעבור דרך קרום התא."
+            },
+            {
+                statement: "התאית היא חומר תשמורת",
+                answer: false,
+                explanation: "לא נכון! התאית היא חומר בניין שמספק קשיחות ותמיכה לדופן התא בצמחים, לא חומר תשמורת."
+            },
+            {
+                statement: "גליקוגן נמצא בצמחים",
+                answer: false,
+                explanation: "לא נכון! גליקוגן הוא חומר תשמורת בבעלי חיים. בצמחים חומר התשמורת הוא עמילן."
+            },
+            {
+                statement: "אינדיקטור הוא חומר בוחן",
+                answer: true,
+                explanation: "נכון! אינדיקטור הוא חומר בוחן שמשנה צבע לזיהוי חומרים."
+            }
+        ];
+
+        // Game State
+        let currentGame = null;
+        let currentIndex = 0;
+        let score = 0;
+        let selectedMatches = [];
+        let matchedPairs = [];
+
+        // Navigation
+        function startGame(gameType) {
+            document.getElementById('menu').style.display = 'none';
+            document.querySelectorAll('.game-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(gameType).classList.add('active');
+            currentGame = gameType;
+            currentIndex = 0;
+            score = 0;
+            selectedMatches = [];
+            matchedPairs = [];
+
+            switch(gameType) {
+                case 'flashcards':
+                    initFlashcards();
+                    break;
+                case 'quiz':
+                    initQuiz();
+                    break;
+                case 'fillblanks':
+                    initFillBlanks();
+                    break;
+                case 'matching':
+                    initMatching();
+                    break;
+                case 'truefalse':
+                    initTrueFalse();
+                    break;
+            }
+        }
+
+        function backToMenu() {
+            document.querySelectorAll('.game-container').forEach(el => el.classList.remove('active'));
+            document.getElementById('menu').style.display = 'grid';
+            currentGame = null;
+        }
+
+        // Flashcards Game
+        function initFlashcards() {
+            document.getElementById('fc-total').textContent = flashcardsData.length;
+            currentIndex = 0;
+            showFlashcard();
+        }
+
+        function showFlashcard() {
+            const card = flashcardsData[currentIndex];
+            document.getElementById('fc-current').textContent = currentIndex + 1;
+            
+            const area = document.getElementById('flashcard-area');
+            area.innerHTML = `
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-front">
+                        <div class="flashcard-content">
+                            <strong>שאלה:</strong><br><br>
+                            ${card.question}
+                        </div>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="flashcard-content">
+                            <strong>תשובה:</strong><br><br>
+                            ${card.answer}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function flipCard(element) {
+            element.classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentIndex < flashcardsData.length - 1) {
+                currentIndex++;
+                showFlashcard();
+            }
+        }
+
+        function previousCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showFlashcard();
+            }
+        }
+
+        // Quiz Game
+        function initQuiz() {
+            document.getElementById('quiz-total').textContent = quizData.length;
+            document.getElementById('quiz-score').textContent = '0';
+            currentIndex = 0;
+            score = 0;
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            if (currentIndex >= quizData.length) {
+                showQuizResults();
+                return;
+            }
+
+            const q = quizData[currentIndex];
+            document.getElementById('quiz-current').textContent = currentIndex + 1;
+            document.getElementById('quiz-progress').style.width = ((currentIndex / quizData.length) * 100) + '%';
+            
+            const area = document.getElementById('quiz-area');
+            let html = `<div class="question">${q.question}</div>`;
+            html += '<div class="options">';
+            
+            q.options.forEach((opt, i) => {
+                html += `<button class="option-btn" onclick="checkQuizAnswer(${i})">${opt}</button>`;
+            });
+            
+            html += '</div>';
+            area.innerHTML = html;
+        }
+
+        function checkQuizAnswer(selected) {
+            const q = quizData[currentIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                } else if (i === selected && i !== q.correct) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (selected === q.correct) {
+                score += 10;
+                document.getElementById('quiz-score').textContent = score;
+            }
+
+            setTimeout(() => {
+                currentIndex++;
+                showQuizQuestion();
+            }, 1500);
+        }
+
+        function showQuizResults() {
+            const percentage = (score / (quizData.length * 10)) * 100;
+            let message = '';
+            let messageClass = 'success';
+
+            if (percentage >= 90) {
+                message = '🌟 מעולה! אתָ מוכנה למבחן!';
+            } else if (percentage >= 70) {
+                message = '👏 יפה מאוד! כמעט מושלם!';
+            } else if (percentage >= 50) {
+                message = '👍 לא רע! תמשיכי לתרגל!';
+            } else {
+                message = '💪 כדאי לחזור על החומר!';
+                messageClass = 'info';
+            }
+
+            document.getElementById('quiz-area').innerHTML = `
+                <div class="result-message ${messageClass}">
+                    ${message}<br>
+                    הניקוד שלך: ${score} מתוך ${quizData.length * 10}
+                </div>
+                <button class="next-btn" onclick="initQuiz()">שחקי שוב 🔄</button>
+                <button class="next-btn" onclick="backToMenu()">חזרה לתפריט 🏠</button>
+            `;
+            document.getElementById('quiz-progress').style.width = '100%';
+        }
+
+        // Fill in the Blanks Game
+        function initFillBlanks() {
+            document.getElementById('fb-total').textContent = fillBlanksData.length;
+            document.getElementById('fb-score').textContent = '0';
+            currentIndex = 0;
+            score = 0;
+            showFillBlankQuestion();
+        }
+
+        function showFillBlankQuestion() {
+            if (currentIndex >= fillBlanksData.length) {
+                showFillBlankResults();
+                return;
+            }
+
+            const q = fillBlanksData[currentIndex];
+            document.getElementById('fb-current').textContent = currentIndex + 1;
+            document.getElementById('fb-progress').style.width = ((currentIndex / fillBlanksData.length) * 100) + '%';
+            
+            let textWithInputs = q.text;
+            q.blanks.forEach((blank, i) => {
+                textWithInputs = textWithInputs.replace('_____', `<input type="text" class="blank-input" data-index="${i}" data-answer="${blank}">`);
+            });
+
+            const area = document.getElementById('fillblank-area');
+            area.innerHTML = `
+                <div class="fill-blank-question">${textWithInputs}</div>
+                <button class="check-btn" onclick="checkFillBlankAnswer()">בדקי תשובה ✓</button>
+            `;
+        }
+
+        function checkFillBlankAnswer() {
+            const q = fillBlanksData[currentIndex];
+            const inputs = document.querySelectorAll('.blank-input');
+            let allCorrect = true;
+
+            inputs.forEach(input => {
+                const userAnswer = input.value.trim();
+                const correctAnswer = input.dataset.answer;
+                
+                if (userAnswer === correctAnswer) {
+                    input.classList.add('correct');
+                } else {
+                    input.classList.add('wrong');
+                    input.value = correctAnswer;
+                    allCorrect = false;
+                }
+                input.disabled = true;
+            });
+
+            if (allCorrect) {
+                score += 10;
+                document.getElementById('fb-score').textContent = score;
+            }
+
+            const area = document.getElementById('fillblank-area');
+            area.innerHTML += `
+                <div class="result-message info" style="margin-top: 20px;">
+                    ${q.explanation}
+                </div>
+                <button class="next-btn" onclick="nextFillBlank()">השאלה הבאה ➡</button>
+            `;
+        }
+
+        function nextFillBlank() {
+            currentIndex++;
+            showFillBlankQuestion();
+        }
+
+        function showFillBlankResults() {
+            const percentage = (score / (fillBlanksData.length * 10)) * 100;
+            let message = '';
+            let messageClass = 'success';
+
+            if (percentage >= 90) {
+                message = '🌟 מעולה! ידע מושלם!';
+            } else if (percentage >= 70) {
+                message = '👏 יפה מאוד! כמעט מושלם!';
+            } else if (percentage >= 50) {
+                message = '👍 לא רע! תמשיכי לתרגל!';
+            } else {
+                message = '💪 כדאי לחזור על החומר!';
+                messageClass = 'info';
+            }
+
+            document.getElementById('fillblank-area').innerHTML = `
+                <div class="result-message ${messageClass}">
+                    ${message}<br>
+                    הניקוד שלך: ${score} מתוך ${fillBlanksData.length * 10}
+                </div>
+                <button class="next-btn" onclick="initFillBlanks()">שחקי שוב 🔄</button>
+                <button class="next-btn" onclick="backToMenu()">חזרה לתפריט 🏠</button>
+            `;
+            document.getElementById('fb-progress').style.width = '100%';
+        }
+
+        // Matching Game
+        function initMatching() {
+            currentIndex = 0;
+            score = 0;
+            selectedMatches = [];
+            matchedPairs = [];
+            document.getElementById('match-score').textContent = '0';
+            showMatchingSet();
+        }
+
+        function showMatchingSet() {
+            if (currentIndex >= matchingData.length) {
+                showMatchingResults();
+                return;
+            }
+
+            const set = matchingData[currentIndex];
+            document.getElementById('match-total').textContent = set.pairs.length;
+            document.getElementById('match-correct').textContent = '0';
+            matchedPairs = [];
+            selectedMatches = [];
+
+            // Shuffle pairs
+            const terms = set.pairs.map((p, i) => ({ ...p, pairId: i, type: 'term' }));
+            const definitions = set.pairs.map((p, i) => ({ ...p, pairId: i, type: 'definition' }));
+            const shuffledDefs = definitions.sort(() => Math.random() - 0.5);
+
+            const area = document.getElementById('matching-area');
+            let html = '<div class="matching-container">';
+            
+            terms.forEach((term, i) => {
+                html += '<div class="matching-pair">';
+                html += `<div class="match-item" data-type="term" data-id="${term.pairId}" onclick="selectMatch(this)">${term.term}</div>`;
+                html += `<div class="match-item" data-type="definition" data-id="${shuffledDefs[i].pairId}" onclick="selectMatch(this)">${shuffledDefs[i].definition}</div>`;
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            area.innerHTML = html;
+
+            document.getElementById('match-progress').style.width = '0%';
+        }
+
+        function selectMatch(element) {
+            if (element.classList.contains('matched')) return;
+            
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                selectedMatches = selectedMatches.filter(el => el !== element);
+            } else {
+                if (selectedMatches.length < 2) {
+                    element.classList.add('selected');
+                    selectedMatches.push(element);
+                    
+                    if (selectedMatches.length === 2) {
+                        checkMatch();
+                    }
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [first, second] = selectedMatches;
+            const id1 = first.dataset.id;
+            const id2 = second.dataset.id;
+            const type1 = first.dataset.type;
+            const type2 = second.dataset.type;
+
+            if (id1 === id2 && type1 !== type2) {
+                // Correct match
+                first.classList.add('matched');
+                second.classList.add('matched');
+                first.classList.remove('selected');
+                second.classList.remove('selected');
+                matchedPairs.push(id1);
+                score += 10;
+                document.getElementById('match-score').textContent = score;
+                document.getElementById('match-correct').textContent = matchedPairs.length;
+                
+                const set = matchingData[currentIndex];
+                const progress = (matchedPairs.length / set.pairs.length) * 100;
+                document.getElementById('match-progress').style.width = progress + '%';
+
+                if (matchedPairs.length === set.pairs.length) {
+                    setTimeout(() => {
+                        if (currentIndex < matchingData.length - 1) {
+                            currentIndex++;
+                            setTimeout(showMatchingSet, 500);
+                        } else {
+                            showMatchingResults();
+                        }
+                    }, 1000);
+                }
+            } else {
+                // Wrong match
+                setTimeout(() => {
+                    first.classList.remove('selected');
+                    second.classList.remove('selected');
+                }, 500);
+            }
+
+            selectedMatches = [];
+        }
+
+        function showMatchingResults() {
+            const totalPairs = matchingData.reduce((sum, set) => sum + set.pairs.length, 0);
+            const maxScore = totalPairs * 10;
+            const percentage = (score / maxScore) * 100;
+            let message = '';
+            let messageClass = 'success';
+
+            if (percentage >= 90) {
+                message = '🌟 מעולה! זיכרון מדהים!';
+            } else if (percentage >= 70) {
+                message = '👏 יפה מאוד! כמעט מושלם!';
+            } else if (percentage >= 50) {
+                message = '👍 לא רע! תמשיכי לתרגל!';
+            } else {
+                message = '💪 כדאי לחזור על החומר!';
+                messageClass = 'info';
+            }
+
+            document.getElementById('matching-area').innerHTML = `
+                <div class="result-message ${messageClass}">
+                    ${message}<br>
+                    הניקוד שלך: ${score} מתוך ${maxScore}
+                </div>
+                <button class="next-btn" onclick="initMatching()">שחקי שוב 🔄</button>
+                <button class="next-btn" onclick="backToMenu()">חזרה לתפריט 🏠</button>
+            `;
+            document.getElementById('match-progress').style.width = '100%';
+        }
+
+        // True/False Game
+        function initTrueFalse() {
+            document.getElementById('tf-total').textContent = trueFalseData.length;
+            document.getElementById('tf-score').textContent = '0';
+            currentIndex = 0;
+            score = 0;
+            showTrueFalseQuestion();
+        }
+
+        function showTrueFalseQuestion() {
+            if (currentIndex >= trueFalseData.length) {
+                showTrueFalseResults();
+                return;
+            }
+
+            const q = trueFalseData[currentIndex];
+            document.getElementById('tf-current').textContent = currentIndex + 1;
+            document.getElementById('tf-progress').style.width = ((currentIndex / trueFalseData.length) * 100) + '%';
+            
+            const area = document.getElementById('truefalse-area');
+            area.innerHTML = `
+                <div class="question">${q.statement}</div>
+                <div class="true-false-btns">
+                    <button class="tf-btn true" onclick="checkTrueFalse(true)">✓ נכון</button>
+                    <button class="tf-btn false" onclick="checkTrueFalse(false)">✗ לא נכון</button>
+                </div>
+            `;
+        }
+
+        function checkTrueFalse(userAnswer) {
+            const q = trueFalseData[currentIndex];
+            const buttons = document.querySelectorAll('.tf-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            const isCorrect = userAnswer === q.answer;
+            if (isCorrect) {
+                score += 10;
+                document.getElementById('tf-score').textContent = score;
+            }
+
+            const area = document.getElementById('truefalse-area');
+            area.innerHTML += `
+                <div class="result-message ${isCorrect ? 'success' : 'info'}" style="margin-top: 20px;">
+                    ${isCorrect ? '✓ נכון!' : '✗ לא נכון'}<br>
+                    ${q.explanation}
+                </div>
+                <button class="next-btn" onclick="nextTrueFalse()">השאלה הבאה ➡</button>
+            `;
+        }
+
+        function nextTrueFalse() {
+            currentIndex++;
+            showTrueFalseQuestion();
+        }
+
+        function showTrueFalseResults() {
+            const percentage = (score / (trueFalseData.length * 10)) * 100;
+            let message = '';
+            let messageClass = 'success';
+
+            if (percentage >= 90) {
+                message = '🌟 מעולה! אתָ מוכנה למבחן!';
+            } else if (percentage >= 70) {
+                message = '👏 יפה מאוד! כמעט מושלם!';
+            } else if (percentage >= 50) {
+                message = '👍 לא רע! תמשיכי לתרגל!';
+            } else {
+                message = '💪 כדאי לחזור על החומר!';
+                messageClass = 'info';
+            }
+
+            document.getElementById('truefalse-area').innerHTML = `
+                <div class="result-message ${messageClass}">
+                    ${message}<br>
+                    הניקוד שלך: ${score} מתוך ${trueFalseData.length * 10}
+                </div>
+                <button class="next-btn" onclick="initTrueFalse()">שחקי שוב 🔄</button>
+                <button class="next-btn" onclick="backToMenu()">חזרה לתפריט 🏠</button>
+            `;
+            document.getElementById('tf-progress').style.width = '100%';
+        }
+    </script>
+</body>
+</html>
